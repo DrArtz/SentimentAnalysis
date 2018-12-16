@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import json
 import os
 import pickle
@@ -8,6 +9,7 @@ import pandas as pd
 import torch
 import torch.optim as optim
 import torch.utils.data
+import torch.nn as nn
 
 from model import LSTMClassifier
 
@@ -66,10 +68,33 @@ def train(model, train_loader, epochs, optimizer, loss_fn, device):
     loss_fn      - The loss function used for training.
     device       - Where the model and data should be loaded (gpu or cpu).
     """
-    
-    # TODO: Paste the train() method developed in the notebook here.
+    for epoch in range(1, epochs + 1):
+        model.train()
+        total_loss = 0
+        for batch in train_loader:         
+            batch_X, batch_y = batch
+            
+            batch_X = batch_X.to(device)
+            batch_y = batch_y.to(device)
+            
+            # TODO: Complete this train method to train the model provided.
+            # forward, back prop
 
-    pass
+            model.zero_grad()
+            # outputs from the rnn
+            prediction = model.forward(batch_X)
+            # perform backpropagation and optimization
+            # calculate the loss
+            loss = loss_fn(prediction, batch_y)
+
+            # perform backprop and update weights
+            loss.backward()
+            nn.utils.clip_grad_norm_(model.parameters(), 5)
+            optimizer.step()
+            
+            total_loss += loss.data.item()
+            
+        print("{} Epoch: {}, BCELoss: {}".format(datetime.datetime.now(), epoch, total_loss / len(train_loader)))
 
 
 if __name__ == '__main__':
