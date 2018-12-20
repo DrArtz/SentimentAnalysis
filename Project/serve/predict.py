@@ -69,9 +69,10 @@ def predict_fn(input_data, model):
     #       You should produce two variables:
     #         data_X   - A sequence of length 500 which represents the converted review
     #         data_len - The length of the review
-
-    data_X, data_len = convert_and_pad(model.word_dict, input_data)
-
+    review_words = review_to_words(input_data)
+    data_X, data_len = convert_and_pad(model.word_dict, review_words)
+    print('type of input data {}'.format(type(data_X)))
+    print('type of input data shape {}'.format(type(data_X[0])))
     # Using data_X and data_len we construct an appropriate input tensor. Remember
     # that our model expects input data of the form 'len, review[500]'.
     data_pack = np.hstack((data_len, data_X))
@@ -86,19 +87,8 @@ def predict_fn(input_data, model):
     # TODO: Compute the result of applying the model to the input data. The variable `result` should
     #       be a numpy array which contains a single integer which is either 1 or 0
     result = model.forward(data)
-
-    return result
-
-def convert_and_pad(word_dict, sentence, pad=500):
-    NOWORD = 0 # We will use 0 to represent the 'no word' category
-    INFREQ = 1 # and we use 1 to represent the infrequent words, i.e., words not appearing in word_dict
     
-    working_sentence = [NOWORD] * pad
+    resu = result.item()
+    rounded_result = round(resu)
     
-    for word_index, word in enumerate(sentence[:pad]):
-        if word in word_dict:
-            working_sentence[word_index] = word_dict[word]
-        else:
-            working_sentence[word_index] = INFREQ
-            
-    return working_sentence, min(len(sentence), pad)
+    return rounded_result
